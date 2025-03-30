@@ -3,10 +3,10 @@
  * 
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-03-18 19:14:30
- * @LastEditTime: 2025-03-25 19:34:50
+ * @LastEditTime: 2025-03-30 16:11:26
  * @FilePath: /BUPT-EDA-Labs/lab1/src/tb.cpp
  * 
- * @Description: Testbench source code
+ * @Description: Testbench for Top Function
  */
 #include <iostream>
 #include <fstream>
@@ -15,30 +15,27 @@
 
 using namespace std;
 
-// 参数定义
-#define SIM_TIME_MS     1000       // 仿真时长(ms)
-#define CARRIER_FREQ    124000   // 载波频率
-#define BIT_RATE        1000     // 数据速率
-#define CODE_RATE       31000    // 码片速率
-#define SAMPLES_PER_MS  (SAMPLE_RATE/1000)  // 每ms样点数
+#define SIM_TIME_MS     1000000             // 仿真时长(ms)
+#define BIT_RATE        1000                // 数据速率
+#define SAMPLES_PER_MS  (SAMPLE_RATE/1000)  // 每 ms 样点数
 
-// 2位补码转换（精确量化）
+// 2位补码转换
 sample_t QuantizeSample(float value) {
-    if(value >= 1.5) return 0b01;   // +1
-    else if(value >= 0.5) return 0b01;
+    if(value >= 1.5) return 0b01;       // +1
+    else if(value >= 0.5) return 0b01;  // +1
     else if(value <= -1.5) return 0b10; // -2
     else if(value <= -0.5) return 0b11; // -1
     else return 0b00;  // 0
 }
 
-// 发送端m序列生成器（与接收端一致）
+// 发送端 m 序列生成器（与接收端一致）
 ap_uint<1> GenerateTxMCode(ap_uint<5> &state) {
-    ap_uint<1> feedback = state[4] ^ state[2]; // x^5 + x^3 +1
+    ap_uint<1> feedback = state[4] ^ state[2];
     state = (state << 1) | feedback;
     return state[0];
 }
 
-// IFin信号生成器（精确模型）
+// IFin 信号生成器
 sample_t GenerateIFSignal(
     ap_uint<1> data_bit,
     ap_uint<5> &tx_m_state,
@@ -49,14 +46,14 @@ sample_t GenerateIFSignal(
     static ap_uint<1> current_data = 0;
     static ap_uint<1> current_code = 0;
     
-    // 每1ms更新数据位
+    // 每 1ms 更新数据位
     if(data_counter >= SAMPLES_PER_MS) {
         current_data = data_bit;
         data_counter = 0;
     }
     data_counter++;
 
-    // 生成码片（31码片/ms，每个码片16样点）
+    // 生成码片（31 码片/ms，每个码片 16 样点）
     int chip_idx = sample_idx % 16;
     if(chip_idx == 0) {
         ap_uint<1> m_code = GenerateTxMCode(tx_m_state);
@@ -71,20 +68,20 @@ sample_t GenerateIFSignal(
     float phase = 2 * M_PI * CARRIER_FREQ * sample_idx / SAMPLE_RATE;
     float if_signal = symbol * cos(phase);
 
-    // 量化（加入噪声模拟实际ADC）
-    if_signal += 0.1*(rand()/(float)RAND_MAX - 0.5); // 添加5%噪声
+    // 量化（加入噪声模拟实际 ADC）
+    if_signal += 0.1*(rand()/(float)RAND_MAX - 0.5); // 添加 5% 噪声
     return QuantizeSample(if_signal);
 }
 
 int main() {
-    // 初始化
+    /******************** 初始化 ***********************/
     sample_t if_in;
     bool sync_flag = false;
     ap_uint<5> rx_m_state = 0b11111;  // 接收端初始状态
     ap_uint<32> phase_acc = 0;
     ap_uint<1> m_code_out;
 
-    // 发送端初始状态（必须与接收端不同以测试同步）
+    // 发送端初始状态（与接收端不同以测试同步）
     ap_uint<5> tx_m_state = 0b11110;  // 初始相位差
 
     // 测试数据（重复序列）
@@ -95,7 +92,10 @@ int main() {
     ofstream logfile("waveform.csv");
     logfile << "Time(n),IF_in,Sync_Flag,Rx_State,Phase_Acc,M_Code_Out" << endl;
 
-    // 运行仿真
+    /*------------------------------------------------*/
+
+
+    /************************ 运行仿真 *******************/
     bool sync_achieved = false;
     for(int t=0; t<SIM_TIME_MS*SAMPLES_PER_MS; t++) {
         // 生成当前数据位索引
@@ -116,7 +116,7 @@ int main() {
                << phase_acc << ","
                << m_code_out << endl;
 
-        // 同步成功后继续运行100样点
+        // 同步成功后继续运行 100 个样点
         if(sync_flag && !sync_achieved) {
             cout << "SYNC Achieved at " << t << " samples ("
                  << t/(float)SAMPLES_PER_MS << " ms)" << endl;
@@ -126,5 +126,7 @@ int main() {
     }
 
     logfile.close();
+    /*--------------------------------------------------*/
+
     return 0;
 }
