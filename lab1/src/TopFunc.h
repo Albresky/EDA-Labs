@@ -1,14 +1,16 @@
 /*
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-04-01 19:45:26
- * @LastEditors: Albresky albre02@outlook.com
- * @LastEditTime: 2025-04-01 19:46:28
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2025-04-03 14:23:46
  * @FilePath: /BUPT-EDA-Labs/lab1/src/TopFunc.h
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
- * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
+#ifndef TOP_FUNC_H
+#define TOP_FUNC_H
+
 #include <ap_int.h>
 #include <hls_math.h>
+#include <hls_stream.h>
 #include <iostream>
 
 #define CARRIER_FREQ 124000                               // 124kHz 载波
@@ -23,24 +25,65 @@
 
 typedef ap_int<2> sample_t; // 2位补码输入
 
-float PhaseDetector(float I, float Q);
+#define STREAM_DEPTH 4096
 
-ap_uint<1> GenerateMCode(ap_uint<5> &state);
+struct PhaseData {
+  float cos_wave;
+  float sin_wave;
+};
 
-void LocalCarrier(ap_uint<32> &phase_acc, float phi_est, float &cos_out,
-                  float &sin_out);
+struct DemodData {
+  float I;
+  float Q;
+};
 
-void CodeController(bool sync_flag, ap_uint<5> &m_state);
+struct IntegralData {
+  float I_sum;
+  float Q_sum;
+  bool integral_done;
+};
 
-void DownConvert(sample_t if_in, float cos_phase, float sin_phase,
-                 ap_uint<1> m_code, float &I_out, float &Q_out);
+struct SyncData {
+  bool sync_flag;
+  float phase_error;
+};
 
-void Integrator(float I_in, float Q_in, float &I_sum, float &Q_sum,
-                ap_uint<16> &sample_count, bool &integral_done);
+void PhaseDetector(hls::stream<DemodData> &input_stream,
+                   hls::stream<float> &phase_error_stream);
 
-void EnergyCalc(float I_sum, float Q_sum, bool &sync_flag, float &max_energy);
+void GenerateMCode(hls::stream<ap_uint<5>> &state_in,
+                   hls::stream<ap_uint<5>> &state_out,
+                   hls::stream<ap_uint<1>> &code_out);
 
-void SpreadSpectrumSync(sample_t if_in, bool &sync_flag, ap_uint<1> &m_code_out,
-                        ap_uint<5> &m_state, ap_uint<32> &phase_acc,
-                        float *I_out = nullptr, float *Q_out = nullptr,
-                        float *phi_est_out = nullptr);
+void LocalCarrier(hls::stream<ap_uint<32>> &phase_acc_in,
+                  hls::stream<ap_uint<32>> &phase_acc_out,
+                  hls::stream<float> &phi_est,
+                  hls::stream<PhaseData> &out_stream);
+
+void CodeController(hls::stream<SyncData> &sync_stream,
+                    hls::stream<ap_uint<5>> &m_state_in,
+                    hls::stream<ap_uint<5>> &m_state_out);
+
+void DownConvert(hls::stream<sample_t> &if_in,
+                 hls::stream<PhaseData> &carrier_stream,
+                 hls::stream<ap_uint<1>> &m_code,
+                 hls::stream<DemodData> &out_stream);
+
+void Integrator(hls::stream<DemodData> &in_stream,
+                hls::stream<IntegralData> &out_stream,
+                hls::stream<ap_uint<16>> &sample_count_in,
+                hls::stream<ap_uint<16>> &sample_count_out);
+
+void EnergyCalc(hls::stream<IntegralData> &in_stream,
+                hls::stream<SyncData> &out_stream,
+                hls::stream<float> &max_energy_in,
+                hls::stream<float> &max_energy_out);
+
+void SignalSync(hls::stream<sample_t> &if_in, hls::stream<bool> &sync_flag_out,
+                hls::stream<ap_uint<1>> &m_code_out,
+                hls::stream<ap_uint<5>> &m_state_out,
+                hls::stream<ap_uint<32>> &phase_acc_out,
+                hls::stream<DemodData> &demod_out,
+                hls::stream<float> &phi_est_out);
+
+#endif // TOP_FUNC_H

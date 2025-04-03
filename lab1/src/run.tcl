@@ -1,6 +1,7 @@
 open_project -reset sync_prj
-set_top SpreadSpectrumSync
+set_top SignalSync
 add_files TopFunc.cpp
+add_files Transmitter.cpp
 add_files -tb tb.cpp
 
 open_solution -reset "solution1" -flow_target vivado
