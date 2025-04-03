@@ -1,0 +1,6 @@
+*.log
+*.txt
+project*
+*_prj
+solution*
+waveform
