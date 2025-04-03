@@ -3,27 +3,13 @@
  *
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-03-18 19:10:53
- * @LastEditTime: 2025-03-30 17:12:58
+ * @LastEditTime: 2025-04-01 19:55:06
  * @FilePath: /BUPT-EDA-Labs/lab1/src/TopFunc.hpp
  *
  * @Description: Top Function
  */
-#include <ap_int.h>
-#include <hls_math.h>
-
-// 定义常量和类型
-#define CARRIER_FREQ 124000                               // 124kHz 载波
-#define SAMPLE_RATE (4 * CARRIER_FREQ)                    // 496kHz 采样率
-#define PHASE_INC (2 * M_PI * CARRIER_FREQ / SAMPLE_RATE) // 载波相位增量
-#define CODE_LENGTH 31                                    // m 码长度
-#define CHIP_RATE 31000                                   // 31kHz 码片速率
-#define SAMPLES_PER_CHIP (SAMPLE_RATE / CHIP_RATE)        // 16 采样/码片
-#define INTEGRAL_TIME 1                                   // 1ms 积分时间 Ts
-#define THRESHOLD 25                                      // 能量阈值
-#define KP_GAIN 0.01                                      // 环路增益
-
-typedef ap_int<2> sample_t;                               // 2位补码输入
-
+#include "TopFunc.h"
+ 
 // 相位误差计算
 float PhaseDetector(float I, float Q) { return (I > 0 ? Q : -Q); }
 
@@ -38,7 +24,7 @@ void LocalCarrier(ap_uint<32> &phase_acc, float phi_est, float &cos_out,
   phase_acc++;
 }
 
-// m 码生成器（31 位 LFSR）
+// m 码生成器（31 位）
 ap_uint<1> GenerateMCode(ap_uint<5> &state) {
 #pragma HLS INLINE
   ap_uint<1> feedback = state[4] ^ state[2]; // 反馈多项式： x^5 + x^3 +1
@@ -60,7 +46,7 @@ void CodeController(bool sync_flag, ap_uint<5> &m_state) {
 void DownConvert(sample_t if_in, float cos_phase, float sin_phase,
                  ap_uint<1> m_code, float &I_out, float &Q_out) {
 #pragma HLS INLINE
-  // 2位补码转浮点（11:-1, 10:-2, 00:0, 01:+1）
+  // 2 位补码转浮点（11:-1, 10:-2, 00:0, 01:+1）
   float if_float;
   switch (if_in) {
   case 0b11:
@@ -88,7 +74,7 @@ void Integrator(float I_in, float Q_in, float &I_sum, float &Q_sum,
   I_sum += I_in;
   Q_sum += Q_in;
 
-  if (++sample_count >= SAMPLES_PER_CHIP * CODE_LENGTH) { // 31 位码片*16=496
+  if (++sample_count >= SAMPLES_PER_CHIP * CODE_LENGTH) { // 31 位码片 * 16 = 496
     integral_done = true;
     sample_count = 0;
   } else {
@@ -118,9 +104,9 @@ void EnergyCalc(float I_sum, float Q_sum, bool &sync_flag, float &max_energy) {
 // 顶层模块
 void SpreadSpectrumSync(sample_t if_in, bool &sync_flag, ap_uint<1> &m_code_out,
                         ap_uint<5> &m_state, ap_uint<32> &phase_acc,
-                        float *I_out = nullptr, float *Q_out = nullptr,
-                        float *phi_est_out = nullptr) {
-#pragma HLS INTERFACE ap_ctrl_none port = return
+                        float *I_out, float *Q_out,
+                        float *phi_est_out) {
+#pragma HLS INTERFACE ap_ctrl_hs port = return
 #pragma HLS PIPELINE II = 1
 
   static float I_accum = 0, Q_accum = 0;

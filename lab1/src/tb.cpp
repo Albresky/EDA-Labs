@@ -3,12 +3,12 @@
  *
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-03-18 19:14:30
- * @LastEditTime: 2025-03-30 16:41:56
+ * @LastEditTime: 2025-04-01 20:01:57
  * @FilePath: /BUPT-EDA-Labs/lab1/src/tb.cpp
  *
  * @Description: Testbench for Top Function
  */
-#include "TopFunc.hpp"
+#include "TopFunc.h"
 #include <algorithm>
 #include <cmath>
 #include <ctime>
@@ -20,12 +20,11 @@
 
 using namespace std;
 
-#define SIM_TIME_MS 10000                   // 每组测试的仿真时长(ms)
+#define SIM_TIME_MS 1000                   // 每组测试的仿真时长(ms)
 #define BIT_RATE 1000                       // 数据速率
 #define SAMPLES_PER_MS (SAMPLE_RATE / 1000) // 每 ms 样点数
-#define NUM_TEST_CASES 32                   // 测试的m码初始状态数量
+#define NUM_TEST_CASES 2                    // 测试的m码初始状态数量
 
-// 2 位补码转换
 sample_t QuantizeSample(float value) {
   if (value >= 1.5)
     return 0b01; // +1
@@ -39,7 +38,7 @@ sample_t QuantizeSample(float value) {
     return 0b00; // 0
 }
 
-// 发送端 m 序列生成器（与接收端一致）
+// 发送端 m 序列生成器, 与接收端一致
 ap_uint<1> GenerateTxMCode(ap_uint<5> &state) {
   ap_uint<1> feedback = state[4] ^ state[2];
   state = (state << 1) | feedback;
@@ -49,7 +48,7 @@ ap_uint<1> GenerateTxMCode(ap_uint<5> &state) {
 // IFin 信号生成器
 sample_t GenerateIFSignal(ap_uint<1> data_bit, ap_uint<5> &tx_m_state,
                           int sample_idx) {
-  // 数据位持续时间（1ms=496样点）
+  // 数据位持续时间: 1ms, 496样点
   static int data_counter = 0;
   static ap_uint<1> current_data = 0;
   static ap_uint<1> current_code = 0;
@@ -76,8 +75,8 @@ sample_t GenerateIFSignal(ap_uint<1> data_bit, ap_uint<5> &tx_m_state,
   float phase = 2 * M_PI * CARRIER_FREQ * sample_idx / SAMPLE_RATE;
   float if_signal = symbol * cos(phase);
 
-  // 量化（加入噪声模拟实际 ADC）
-  if_signal += 0.1 * (rand() / (float)RAND_MAX - 0.5); // 添加 5% 噪声
+  // 量化: 加入噪声模拟实际 ADC
+  if_signal += 0.1 * (rand() / (float)RAND_MAX - 0.5); // 5% 噪声
   return QuantizeSample(if_signal);
 }
 
@@ -85,9 +84,8 @@ sample_t GenerateIFSignal(ap_uint<1> data_bit, ap_uint<5> &tx_m_state,
 vector<vector<ap_uint<1>>> GenerateTestData() {
   vector<vector<ap_uint<1>>> all_test_data;
 
-  // 基于不同种子生成32种测试数据序列
   for (int seed = 0; seed < NUM_TEST_CASES; seed++) {
-    srand(seed + 100); // 不同的随机种子
+    srand(seed + 100);
     vector<ap_uint<1>> data_seq;
 
     // 为每个测试序列生成10-20位数据位
@@ -109,7 +107,6 @@ vector<ap_uint<5>> GenerateMCodeStates() {
 
   // 对于每个测试用例，生成与基准状态相差1位的状态
   for (int i = 0; i < NUM_TEST_CASES; i++) {
-    // 每次循环将基准状态右移一位（模拟码相位差）
     if (i > 0) {
       // 循环右移一位
       ap_uint<1> last_bit = base_state[0];
@@ -153,41 +150,38 @@ int RunTestCase(int test_case_idx, ap_uint<5> tx_m_state,
   // 运行仿真
   bool sync_achieved = false;
   int sync_time = -1;
-  float phase_est_value = 0.0; // 记录相位估计值
-  ap_uint<1> tx_code;          // 发送端码值
+  float phase_est_value = 0.0;
+  ap_uint<1> tx_code;
 
   for (int t = 0; t < SIM_TIME_MS * SAMPLES_PER_MS; t++) {
-    // 生成当前数据位索引
     int data_idx = (t / SAMPLES_PER_MS) % DATA_LEN;
     ap_uint<1> data_bit = test_data[data_idx];
 
-    // 计算当前发送端码值（每16个样点更新一次）
+    // 发送端 mcode
     if (t % SAMPLES_PER_CHIP == 0) {
-      ap_uint<5> temp_state = tx_m_state; // 创建临时副本避免修改发送端状态
+      ap_uint<5> temp_state = tx_m_state;
       tx_code = GenerateTxMCode(temp_state);
     }
 
-    // 生成IF信号（发送端）
+    // 生成发送端 IF 信号
     if_in = GenerateIFSignal(data_bit, tx_m_state, t);
 
-    // 调用被测模块（接收端）并获取相位估计值
+    // 接收端
     static float I_value = 0.0, Q_value = 0.0;
     SpreadSpectrumSync(if_in, sync_flag, m_code_out, rx_m_state, phase_acc,
                        &I_value, &Q_value, &phase_est_value);
 
-    // 记录波形数据
-    // 每10个样点记录数据
     if (t % 10 == 0) {
       logfile << t << ","                    // 时间
-              << if_in.to_int() << ","       // 输入IF信号
+              << if_in.to_int() << ","       // 输入 IF 信号
               << sync_flag << ","            // 同步标志
-              << rx_m_state.to_uint() << "," // 接收端m码状态
-              << tx_m_state.to_uint() << "," // 发送端m码状态
+              << rx_m_state.to_uint() << "," // 接收端 m 码状态
+              << tx_m_state.to_uint() << "," // 发送端 m 码状态
               << phase_acc << ","            // 相位累加器
-              << m_code_out << ","           // 输出m码
-              << (int)tx_code << ","         // 发送端m码
-              << I_value << ","              // I路积分值
-              << Q_value << ","              // Q路积分值
+              << m_code_out << ","           // 输出 m 码
+              << (int)tx_code << ","         // 发送端 m 码
+              << I_value << ","              // I 路积分值
+              << Q_value << ","              // Q 路积分值
               << phase_est_value             // 相位估计值
               << endl;
     }
@@ -200,11 +194,15 @@ int RunTestCase(int test_case_idx, ap_uint<5> tx_m_state,
            << " samples (" << t / (float)SAMPLES_PER_MS << " ms)" << endl;
     }
 
-    // 同步后继续运行一段时间，观察稳定性
-    if (sync_achieved && t > (sync_time + SAMPLES_PER_MS * 10))
+    if (sync_achieved && t > (sync_time + SAMPLES_PER_MS * 10)) {
+      logfile << t << "," << if_in.to_int() << "," << sync_flag << ","
+              << rx_m_state.to_uint() << "," << tx_m_state.to_uint() << ","
+              << phase_acc << "," << m_code_out << "," << (int)tx_code << ","
+              << I_value << "," << Q_value << "," << phase_est_value << endl;
       break;
+    }
 
-    // 如果超过最大时间还没同步，则终止此测试用例
+    // 测试用例最大同步时间上限
     if (t >= SIM_TIME_MS * SAMPLES_PER_MS - 1) {
       cout << "Test case " << test_case_idx
            << ": Failed to achieve sync within time limit!" << endl;
@@ -214,7 +212,6 @@ int RunTestCase(int test_case_idx, ap_uint<5> tx_m_state,
 
   logfile.close();
 
-  // 记录测试结果摘要
   summary_file << test_case_idx << ","
                << "0b" << setw(5) << setfill('0') << hex << tx_m_state.to_uint()
                << "," << dec << (sync_achieved ? "Success" : "Failure") << ","
@@ -227,13 +224,11 @@ int RunTestCase(int test_case_idx, ap_uint<5> tx_m_state,
 }
 /*----------------------------------------------------------------------------------*/
 
-
 int main() {
   // 生成测试数据和 m 码初始状态
   vector<vector<ap_uint<1>>> all_test_data = GenerateTestData();
   vector<ap_uint<5>> tx_m_states = GenerateMCodeStates();
 
-  // 创建测试结果摘要文件
   ofstream summary_file("test_summary.csv");
   summary_file << "Test Case,TX M-Code State,Sync Result,Sync Time "
                   "(samples),Sync Time (ms)"

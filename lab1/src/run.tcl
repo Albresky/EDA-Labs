@@ -1,5 +1,5 @@
 open_project -reset sync_prj
-set_top TopFunc
+set_top SpreadSpectrumSync
 add_files TopFunc.cpp
 add_files -tb tb.cpp
 
@@ -8,8 +8,8 @@ set_part {xc7z020clg400-1}
 create_clock -period 10 -name default
 
 set CSIM 1
-set CSYNTH 0
-set COSIM 0
+set CSYNTH 1
+set COSIM 1
 
 if {$CSIM == 1} {
   puts "Starting Csim..."
