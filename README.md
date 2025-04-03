@@ -20,6 +20,6 @@ EDA Labs for graduate students' course in BUPT-IC.
 
 ## About
 
-This repo is for the course of Digital Integrated Circuit EDA Tools Design Practice (数字集成电路 EDA 工具设计实践) in BUPT-IC. The course is taught by [Prof. Weijun Lu](https://ic.bupt.edu.cn/info/1051/1156.htm/). and designed for graduate students in the field of integrated circuit design and EDA tools.
+This repo is for the course of Digital Integrated Circuit EDA Tools Design Practice (数字集成电路 EDA 工具设计实践) in BUPT-IC. 
 
-**NOTE:** This repo is for educational purposes only. The author IS NOT responsible for any unfavorable impact caused by the use of the code or designs under this repo. *Copy and modify the code at your own risk.*
+***NOTE:** This repo is for educational purposes only. The author IS NOT responsible for any unfavorable impact caused by the use of the code or designs under this repo. Copy and modify the code at your own risk.*
