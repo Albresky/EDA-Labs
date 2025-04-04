@@ -5,6 +5,9 @@ all: run vivado
 run:
 	vitis_hls -f run.tcl
 
+runbd:
+	vitis_hls -f runbd.tcl
+
 vivado: run
 	vivado -mode batch -source vivado_run.tcl
 
