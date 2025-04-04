@@ -2,16 +2,23 @@
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-04-01 19:45:26
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2025-04-03 14:23:46
+ * @LastEditTime: 2025-04-04 17:29:16
  * @FilePath: /BUPT-EDA-Labs/lab1/src/TopFunc.h
  */
 #ifndef TOP_FUNC_H
 #define TOP_FUNC_H
 
+#include <algorithm>
 #include <ap_int.h>
+#include <cmath>
+#include <ctime>
+#include <fstream>
 #include <hls_math.h>
 #include <hls_stream.h>
+#include <iomanip>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #define CARRIER_FREQ 124000                               // 124kHz 载波
 #define SAMPLE_RATE (4 * CARRIER_FREQ)                    // 496kHz 采样率
@@ -20,8 +27,15 @@
 #define CHIP_RATE 31000                                   // 31kHz 码片速率
 #define SAMPLES_PER_CHIP (SAMPLE_RATE / CHIP_RATE)        // 16 采样/码片
 #define INTEGRAL_TIME 1                                   // 1ms 积分时间 Ts
-#define THRESHOLD 25                                      // 能量阈值
+#define THRESHOLD 3                                      // 能量阈值
 #define KP_GAIN 0.01                                      // 环路增益
+
+#define DATA_LEN 15
+
+#define SIM_TIME_MS 1000                   // 每组测试的仿真时长(ms)
+#define BIT_RATE 1000                       // 数据速率
+#define SAMPLES_PER_MS (SAMPLE_RATE / 1000) // 每 ms 样点数
+#define NUM_TEST_CASES 2                    // 测试的 m 码初始状态数量
 
 typedef ap_int<2> sample_t; // 2位补码输入
 
@@ -48,42 +62,41 @@ struct SyncData {
   float phase_error;
 };
 
-void PhaseDetector(hls::stream<DemodData> &input_stream,
-                   hls::stream<float> &phase_error_stream);
+float PhaseDetector(float I, float Q);
 
-void GenerateMCode(hls::stream<ap_uint<5>> &state_in,
-                   hls::stream<ap_uint<5>> &state_out,
-                   hls::stream<ap_uint<1>> &code_out);
+void CodeController(bool sync_flag, ap_uint<5> &m_state);
 
-void LocalCarrier(hls::stream<ap_uint<32>> &phase_acc_in,
-                  hls::stream<ap_uint<32>> &phase_acc_out,
-                  hls::stream<float> &phi_est,
-                  hls::stream<PhaseData> &out_stream);
+sample_t QuantizeSample(float value);
 
-void CodeController(hls::stream<SyncData> &sync_stream,
-                    hls::stream<ap_uint<5>> &m_state_in,
-                    hls::stream<ap_uint<5>> &m_state_out);
+ap_uint<1> GenerateMCode(ap_uint<5> &state);
 
-void DownConvert(hls::stream<sample_t> &if_in,
-                 hls::stream<PhaseData> &carrier_stream,
-                 hls::stream<ap_uint<1>> &m_code,
-                 hls::stream<DemodData> &out_stream);
+ap_uint<1> GenerateTxMCode(ap_uint<5> &state);
 
-void Integrator(hls::stream<DemodData> &in_stream,
-                hls::stream<IntegralData> &out_stream,
-                hls::stream<ap_uint<16>> &sample_count_in,
-                hls::stream<ap_uint<16>> &sample_count_out);
+void LocalCarrier(ap_uint<32> &phase_acc, float phi_est, float &cos_out,
+                  float &sin_out);
 
-void EnergyCalc(hls::stream<IntegralData> &in_stream,
-                hls::stream<SyncData> &out_stream,
-                hls::stream<float> &max_energy_in,
-                hls::stream<float> &max_energy_out);
+void DownConvert(sample_t if_in, float cos_phase, float sin_phase,
+                 ap_uint<1> m_code, float &I_out, float &Q_out);
 
-void SignalSync(hls::stream<sample_t> &if_in, hls::stream<bool> &sync_flag_out,
-                hls::stream<ap_uint<1>> &m_code_out,
-                hls::stream<ap_uint<5>> &m_state_out,
-                hls::stream<ap_uint<32>> &phase_acc_out,
-                hls::stream<DemodData> &demod_out,
-                hls::stream<float> &phi_est_out);
+void Integrator(float &I_in, float &Q_in, float &I_sum, float &Q_sum,
+                ap_uint<16> &sample_count, ap_uint<1> &integral_done);
+
+void EnergyCalc(float I_sum, float Q_sum, ap_uint<1> &sync_flag,
+                float &max_energy);
+
+void transmitter_wrapper(ap_uint<5> tx_m_state, ap_uint<5> rx_m_state,
+                         ap_uint<DATA_LEN> &test_data,
+                         ap_uint<1> &sync_flag_out,
+                         hls::stream<ap_uint<1>> &sync_flag_in_strm,
+                         hls::stream<ap_uint<1>> &end_flag_out_strm,
+                         hls::stream<sample_t> &if_signal_out_strm);
+
+void receiver_wrapper(ap_uint<5> rx_m_state,
+                      hls::stream<sample_t> &if_signal_in_strm,
+                      hls::stream<ap_uint<1>> &end_flag_in_strm,
+                      hls::stream<ap_uint<1>> &sync_flag_out_strm);
+
+void TopFunc(ap_uint<DATA_LEN> test_data, ap_uint<5> tx_m_state,
+             ap_uint<5> rx_m_state, ap_uint<1> &sync_flag);
 
 #endif // TOP_FUNC_H

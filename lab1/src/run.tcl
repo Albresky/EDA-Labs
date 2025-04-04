@@ -1,11 +1,11 @@
 open_project -reset sync_prj
-set_top SignalSync
+set_top TopFunc
+# add_files TopFunc.cpp -cflags "-DALLOW_EMPTY_HLS_STREAM_READS"
 add_files TopFunc.cpp
-add_files Transmitter.cpp
 add_files -tb tb.cpp
 
 open_solution -reset "solution1" -flow_target vivado
-set_part {xc7z020clg400-1}
+set_part {xcvu9p-flga2104-2-i}
 create_clock -period 10 -name default
 
 set CSIM 1
