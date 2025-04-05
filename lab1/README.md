@@ -146,19 +146,6 @@ void CodeController(bool sync_flag, ap_uint<5> &m_state) {
 }
 ```
 
-
-### 四、仿真结果
-
-关键参数的波形如下。
-
-**信号同步成功** 时：
-
-![](./image/sync_visualization_case_ok.png)
-
-**信号同步失败** 时：
-
-![](./image/sync_visualization_case_fail.png)
-
 # 任务三：利用 AI 辅助设计复杂信号捕获电路（附加）
 
 ## 北斗 B1I 信号特性
@@ -206,3 +193,5 @@ void CodeController(bool sync_flag, ap_uint<5> &m_state) {
 3. 对每个码相位计算相关值
 4. 找出最大相关值对应的码相位和多普勒频移
 5. 计算信噪比并判断信号是否捕获成功
+
+
