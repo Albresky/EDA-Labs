@@ -3,14 +3,19 @@
  *
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-03-18 19:10:53
- * @LastEditTime: 2025-04-04 17:12:06
+ * @LastEditTime: 2025-04-05 21:58:37
  * @FilePath: /BUPT-EDA-Labs/lab1/src/TopFunc.cpp
  *
  * @Description: Top Function
  */
 #include "TopFunc.h"
+#include <fstream>
 
 using namespace std;
+
+ofstream log_file("log.txt");
+
+
 
 // 相位误差计算
 float PhaseDetector(float I, float Q) {
@@ -100,23 +105,23 @@ void EnergyCalc(float I_sum, float Q_sum, ap_uint<1> &sync_flag,
     max_energy = S;
   }
 
-  std::cout << "Energy: " << S << ", max_energy: " << max_energy
+  log_file << "Energy: " << S << ", max_energy: " << max_energy
             << ", Sync: " << sync_flag << std::endl;
 
   if (sync_flag) {
-    std::cout << "Synchronization achieved, I_sum: " << I_sum
+    log_file << "Synchronization achieved, I_sum: " << I_sum
               << ", Q_sum: " << Q_sum << std::endl;
   }
 }
 
 sample_t QuantizeSample(float value) {
-  if (value >= 1.5)
+  if (value >= 0.5)
+    return 0b00;
+  else if (value >= 0)
     return 0b01; // +1
-  else if (value >= 0.5)
-    return 0b01; // +1
-  else if (value <= -1.5)
+  else if (value >= -0.5)
     return 0b10; // -2
-  else if (value <= -0.5)
+  else if (value >= -1)
     return 0b11; // -1
   else
     return 0b00; // 0
