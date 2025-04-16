@@ -12,9 +12,9 @@ vivado: run
 	vivado -mode batch -source vivado_run.tcl
 
 clean:
-	rm -rf *_prj *.log waveform
+	rm -rf *_prj *.log waveform logs *.png
 
 clean_vivado:
-	rm -rf vivado_prj .Xil *.jou *.str
+	rm -rf vivado_prj .Xil *.jou *.str _ide .wsdata
 
 clean_all: clean clean_vivado

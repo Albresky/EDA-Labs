@@ -1,8 +1,8 @@
 /*
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-04-01 19:45:26
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2025-04-04 17:29:16
+ * @LastEditors: Albresky albre02@outlook.com
+ * @LastEditTime: 2025-04-08 19:22:47
  * @FilePath: /BUPT-EDA-Labs/lab1/src/TopFunc.h
  */
 #ifndef TOP_FUNC_H
@@ -27,12 +27,12 @@
 #define CHIP_RATE 31000                                   // 31kHz 码片速率
 #define SAMPLES_PER_CHIP (SAMPLE_RATE / CHIP_RATE)        // 16 采样/码片
 #define INTEGRAL_TIME 1                                   // 1ms 积分时间 Ts
-#define THRESHOLD 3                                      // 能量阈值
+#define THRESHOLD 40                                      // 能量阈值
 #define KP_GAIN 0.01                                      // 环路增益
 
 #define DATA_LEN 15
 
-#define SIM_TIME_MS 1000                   // 每组测试的仿真时长(ms)
+#define SIM_TIME_MS 1200                   // 每组测试的仿真时长(ms)
 #define BIT_RATE 1000                       // 数据速率
 #define SAMPLES_PER_MS (SAMPLE_RATE / 1000) // 每 ms 样点数
 #define NUM_TEST_CASES 2                    // 测试的 m 码初始状态数量

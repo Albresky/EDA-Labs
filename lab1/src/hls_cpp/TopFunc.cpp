@@ -3,7 +3,7 @@
  *
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-03-18 19:10:53
- * @LastEditTime: 2025-04-05 21:58:37
+ * @LastEditTime: 2025-04-16 20:39:44
  * @FilePath: /BUPT-EDA-Labs/lab1/src/TopFunc.cpp
  *
  * @Description: Top Function
@@ -13,13 +13,33 @@
 
 using namespace std;
 
-ofstream log_file("log.txt");
-
-
+// ofstream log_file("log.txt");
 
 // 相位误差计算
-float PhaseDetector(float I, float Q) {
-#pragma HLS inline
+float PhaseDetector(float I, float Q) {# 文件名设置
+  TOP_MODULE = TopFunc_tb
+  SRC_FILES = TopFunc_tb.v TopFunc.v Modulator.v DownConvert.v Integrator.v Detector.v GenerateMCode.v
+  VCD_FILE = $(TOP_MODULE).vcd
+  
+  # 仿真目标
+  all: run
+  
+  # 编译
+  compile:
+    iverilog -o $(TOP_MODULE).out $(SRC_FILES)
+  
+  # 运行
+  run: compile
+    vvp $(TOP_MODULE).out
+  
+  # 打开波形
+  wave:
+    gtkwave $(VCD_FILE)
+  
+  # 清理中间文件
+  clean:
+    rm -f *.out *.vcd
+  
   return (I > 0 ? Q : -Q);
 }
 
@@ -64,13 +84,13 @@ void DownConvert(sample_t if_in, float cos_phase, float sin_phase,
     if_float = -1.0;
     break;
   case 0b10:
-    if_float = -2.0;
+    if_float = -0.5;
     break;
   case 0b00:
-    if_float = 0.0;
+    if_float = 0.5;
     break;
   default:
-    if_float = 1.0; // 01
+    if_float = 0.0; // 01
   }
 
   // 下变频
@@ -105,13 +125,13 @@ void EnergyCalc(float I_sum, float Q_sum, ap_uint<1> &sync_flag,
     max_energy = S;
   }
 
-  log_file << "Energy: " << S << ", max_energy: " << max_energy
-            << ", Sync: " << sync_flag << std::endl;
+//   log_file << "Energy: " << S << ", max_energy: " << max_energy
+//             << ", Sync: " << sync_flag << std::endl;
 
-  if (sync_flag) {
-    log_file << "Synchronization achieved, I_sum: " << I_sum
-              << ", Q_sum: " << Q_sum << std::endl;
-  }
+//   if (sync_flag) {
+//     log_file << "Synchronization achieved, I_sum: " << I_sum
+//               << ", Q_sum: " << Q_sum << std::endl;
+//   }
 }
 
 sample_t QuantizeSample(float value) {
@@ -139,7 +159,7 @@ ap_uint<1> GenerateTxMCode(ap_uint<5> &state) {
 sample_t GenerateIFSignal(ap_uint<1> data_bit, ap_uint<5> &tx_m_state,
                           int sample_idx) {
 #pragma HLS inline off
-  // 数据位持续时间: 1ms, 496样点
+  // 数据位持续时间: 1ms, 496 样点
   static int data_counter = 0;
   static ap_uint<1> current_data = 0;
   static ap_uint<1> current_code = 0;
@@ -171,7 +191,7 @@ sample_t GenerateIFSignal(ap_uint<1> data_bit, ap_uint<5> &tx_m_state,
   return QuantizeSample(if_signal);
 }
 
-void transmitter_wrapper(ap_uint<5> tx_m_state, ap_uint<5> rx_m_state,
+void transmitter_wrapper(ap_uint<5> tx_m_state,
                          ap_uint<DATA_LEN> &test_data,
                          ap_uint<1> &sync_flag_out,
                          hls::stream<ap_uint<1>> &sync_flag_in_strm,
@@ -291,7 +311,7 @@ void TopFunc(ap_uint<DATA_LEN> test_data, ap_uint<5> tx_m_state,
   hls::stream<sample_t> if_signal_strm("if_signal_strm");
 #pragma HLS stream variable = if_signal_strm type = fifo depth = 8192
 
-  transmitter_wrapper(tx_m_state, rx_m_state, test_data, sync_flag,
+  transmitter_wrapper(tx_m_state, test_data, sync_flag,
                       sync_flag_strm, end_flag_strm, if_signal_strm);
   receiver_wrapper(rx_m_state, if_signal_strm, end_flag_strm, sync_flag_strm);
 }
