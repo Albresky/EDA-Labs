@@ -1,0 +1,1 @@
+This folder contains the Verilog version of lab1.
