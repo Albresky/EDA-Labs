@@ -1,0 +1,1 @@
+This folder contains RTL verilog for [synthesis](../syn).

@@ -1,0 +1,1 @@
+This folder contains template .tcl scripts for DC to synthesis. The [./scripts/gen_tcl.sh](./scripts/gen_tcl.sh) shell script is used to generate mapped RTL under different CPU frequencies, which could be modifid in [Makefile](../Makefile).

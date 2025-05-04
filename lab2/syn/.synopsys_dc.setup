@@ -1,0 +1,10 @@
+history keep 290
+alias h history
+alias rc "report_constraint-all_violators"
+alias rt report _timing
+alias ra report_area
+alias rq report_qor
+alias page_on {set sh_enable_page_mode true}
+alias page_off (set sh_enable_page_mode_false)
+alias fr "remove design -designs"
+source common_setup.tcl

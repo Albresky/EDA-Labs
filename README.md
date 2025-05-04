@@ -3,7 +3,7 @@
  * 
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-03-20 02:09:15
- * @LastEditTime: 2025-03-30 17:30:46
+ * @LastEditTime: 2025-05-04 14:43:48
  * @FilePath: /BUPT-EDA-Labs/README.md
  * 
  * @Description: 数字集成电路 EDA 工具设计实践 README
@@ -14,7 +14,8 @@ EDA Labs for graduate students' course in BUPT-IC.
 
 ## Assignments
 
-- [实验 1：简单通信信号同步电路设计](lab1/README.md)
+- [实验 1：简单通信信号同步电路设计](lab1)
+- [实验 2：简单处理器（CPU）的逻辑综合](lab2)
 
 
 
