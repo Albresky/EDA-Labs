@@ -1,98 +1,97 @@
-// cpu.v
-`timescale 1 ns / 1 ns
+`timescale 1ns / 1ns
 
 module cpu (
-    input          rst_,
-    input          clock,
-    output         rd,
-    output         wr,
-    output [7:0]   data_in,
-    input  [7:0]   data_out,
-    output [4:0]   addr,
-    output         halt
+    rst_,
+    clock,
+    rd,
+    wr,
+    data_in,
+    data_out,
+    addr
 );
+    input  rst_;
+    input  clock;
+    output rd;
+    output wr;
+    output [7:0] data_in;
+    reg    [7:0] data_in;
+    input  [7:0] data_out;
+    output [4:0] addr;
+    
+    // Internal signals
+    wire [7:0] alu_out;
+    wire [7:0] ir_out;
+    wire [7:0] ac_out;
+    wire [4:0] pc_addr;
+    wire [4:0] ir_addr;
+    wire [2:0] opcode;
 
-  // --- 中间信号声明 ---
-  wire        ld_ir, ld_ac, ld_pc, inc_pc;
-  wire        data_e, sel, zero;
-  wire [2:0]  opcode;
-  wire [4:0]  ir_addr, pc_addr;
-  wire [7:0]  ir_out, ac_out, alu_out;
-
-  // 指令寄存器高 3 位是 opcode，低 5 位是地址
-  assign opcode  = ir_out[7:5];
-  assign ir_addr = ir_out[4:0];
-  assign addr    = pc_addr;    // 取址信号最终由 PC 输出
-
-  // 控制单元
-  control ctl1 (
-    .clk    (clock),
-    .rst_   (rst_),
-    .zero   (zero),
-    .opcode (opcode),
-    .sel    (sel),
-    .rd     (rd),
-    .wr     (wr),
-    .ld_ir  (ld_ir),
-    .ld_ac  (ld_ac),
-    .ld_pc  (ld_pc),
-    .inc_pc (inc_pc),
-    .halt   (halt),
-    .data_e (data_e)
-  );
-
-  // 算术逻辑单元
-  alu alu1 (
-    .out    (alu_out),
-    .zero   (zero),
-    .opcode (opcode),
-    .data   (data_out),
-    .accum  (ac_out)
-  );
-
-  // 累加器寄存器
-  register ac (
-    .clk   (clock),
-    .rst_  (rst_),
-    .load  (ld_ac),
-    .data  (alu_out),
-    .out   (ac_out)
-  );
-
-  // 指令寄存器
-  register ir (
-    .clk   (clock),
-    .rst_  (rst_),
-    .load  (ld_ir),
-    .data  (data_out),
-    .out   (ir_out)
-  );
-
-  // 地址多路选择器
-  scale_mux #(.WIDTH(5)) smx (
-    .sel (sel),
-    .a   (ir_addr),
-    .b   (pc_addr),
-    .out (addr)
-  );
-
-  // 程序计数器
-  counter pc (
-    .clk   (inc_pc),
-    .rst_  (rst_),
-    .load  (ld_pc),
-    .data  (ir_addr),
-    .cnt   (pc_addr)
-  );
-
-  // 数据总线驱动：高阻或累加器输出
-  reg [7:0] data_in_reg;
-  always @(*) begin
-    if (data_e)
-      data_in_reg = alu_out;
-    else
-      data_in_reg = 8'bz;
-  end
-  assign data_in = data_in_reg;
-
+    // Extract instruction fields
+    assign opcode  = ir_out[7:5];
+    assign ir_addr = ir_out[4:0];
+    
+    // Control unit
+    control ctl1 (
+        .rd     (rd),
+        .wr     (wr),
+        .ld_ir  (ld_ir),
+        .ld_ac  (ld_ac),
+        .ld_pc  (ld_pc),
+        .inc_pc (inc_pc),
+        .halt   (halt),
+        .data_e (data_e),
+        .sel    (sel),
+        .opcode (opcode),
+        .zero   (zero),
+        .clk    (clock),
+        .rst_   (rst_)
+    );
+    
+    // ALU
+    alu alu1 (
+        .out    (alu_out),
+        .zero   (zero),
+        .opcode (opcode),
+        .data   (data_out),
+        .accum  (ac_out)
+    );
+    
+    // Accumulator register
+    register ac (
+        .out  (ac_out),
+        .data (alu_out),
+        .load (ld_ac),
+        .clk  (clock),
+        .rst_ (rst_)
+    );
+    
+    // Instruction register
+    register ir (
+        .out  (ir_out),
+        .data (data_out),
+        .load (ld_ir),
+        .clk  (clock),
+        .rst_ (rst_)
+    );
+    
+    // Address multiplexer
+    scale_mux #5 smx (
+        .out (addr),
+        .sel (sel),
+        .b   (pc_addr),
+        .a   (ir_addr)
+    );
+    
+    // Program counter
+    counter pc (
+        .cnt  (pc_addr),
+        .data (ir_addr),
+        .load (ld_pc),
+        .clk  (inc_pc),
+        .rst_ (rst_)
+    );
+    
+    // Data input multiplexing
+    always @(*) 
+        data_in = (data_e) ? alu_out : 8'bz;
 endmodule

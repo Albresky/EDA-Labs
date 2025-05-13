@@ -16,7 +16,6 @@ read_verilog ../cpu/scale_mux.v
 
 # Set Top
 current_design cpu_pad
-set_top cpu_pad
 
 # Link
 link
@@ -37,13 +36,12 @@ suppress_message UID-401
 
 #Set constraints on input ports
 set_input_delay 0.1 -max -clock clock [remove_from_collection [all_inputs] [get_ports clock]]
-set_input_delay 1.2 -max -clock clock [get_ports Neg_Flag]
 
 #Set constraints on output ports
 set_output_delay 1 -max -clock clock [all_outputs]
 
-set_driving_cell -library slib_name -lib_cell AND2X4 [remove_from_collection [all_inputs] [get_ports clock]]
-set_load [expr [load_of slib_name/AND2X4/A]*15][all_outputs]
+set_driving_cell -library $lib_name -lib_cell AND2X4 [remove_from_collection [all_inputs] [get_ports clock]]
+set_load [expr [load_of $lib_name/AND2X4/A]*15] [all_outputs]
 
 set_dont_touch_network [get_ports clock]
 set_dont_touch_network [get_ports rst_]

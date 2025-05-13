@@ -9,7 +9,6 @@ module cpu_pad_test;
   wire [7:0] data_out;
   wire clock;
   wire rd, wr;
-  wire halt;
   
   // Set different clock periods based on frequency
   `ifdef SDF_150MHz
@@ -34,7 +33,6 @@ module cpu_pad_test;
     .clock(clock), 
     .rd(rd),
     .wr(wr),
-    .halt(halt),
     .data_in(data_in),
     .data_out(data_out),
     .addr(addr)
@@ -102,9 +100,9 @@ module cpu_pad_test;
      $display("* Enter \"scope cpu_test; deposit test.N 3; task test; run\" *");
      $display("*         to run the Fibonacci program.                    *");
      $display("* Enter \"scope cpu_test; deposit test.N 4; task test; run\" *");
-     $display("*         to run the COUNTER program.                      *");
+     $display("*         to run the COUNTER program.               *");
      $display("* Enter \"scope cpu_test; deposit test.N 5; task test; run\" *");
-     $display("*         to run the 2^n program.                          *");
+     $display("*         to run the 2^n program.                    *");
      $display("************************************************************\n");
     `else
      $display("\n***********************************************************");
@@ -121,9 +119,8 @@ module cpu_pad_test;
     rst_ = 0;
     @ (negedge clock)
     rst_ = 1;
-    // @ (posedge cpu_pad1.i_cpu.halt)  // Note: path may need adjustment in gate-level netlist
-    @ (posedge halt)  // Note: path may need adjustment in gate-level netlist
-    $display("HALTED AT PC = %h", "??");  // May not be able to directly access PC in gate-level netlist
+    @ (posedge cpu_pad1.i_cpu.halt)
+    $display("HALTED AT PC = %h", cpu_pad1.i_cpu.pc_addr);
     $finish;
   end
 

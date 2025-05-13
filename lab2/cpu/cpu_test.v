@@ -95,7 +95,7 @@ module cpu_test;
       rst_ = 0;
       @ ( negedge cpu1.clock )
       rst_ = 1;
-      @ ( posedge cpu1.halt )
+      @ ( posedge cpu1.ctl1.halt )
       $display ( "HALTED AT PC = %h", cpu1.pc_addr ) ;
       disable test ;  //检测到HALT指令，测试就结束
     end
