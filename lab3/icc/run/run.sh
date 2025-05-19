@@ -1,4 +1,3 @@
-#!/bin/bash
 
 echo "Starting ICC flow..."
 
@@ -20,6 +19,6 @@ source ./route.tcl
 echo "source ./spef_home.tcl"
 source ./spef_home.tcl
 
-echo "pt_shell -f ./sdf_gen.tcl 2>&1 | tee ../log/sdf_gen.log"
-pt_shell -f ./sdf_gen.tcl 2>&1 | tee ../log/sdf_gen.log
+echo "pt_shell -f ./sdf_gen.tcl 2>&1 | tee ../logs/sdf_gen.log"
+pt_shell -f ./sdf_gen.tcl 2>&1 | tee ../logs/sdf_gen.log
 
