@@ -1,5 +1,5 @@
 module scale_mux(out,sel,b,a);
-parameter size=8;
+parameter size=5;
 output[size-1:0] out;
 input[size-1:0]b,a;
 input sel;

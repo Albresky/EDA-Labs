@@ -52,8 +52,7 @@ module cpu_pad_test;
   reg [2:0] opcode;
   always @(*) begin
     // Extract opcode from CPU internal signals - Note: path may need adjustment for gate-level netlist
-    opcode = 3'h0; // Default value, may need adjustment in actual use
-    
+    opcode = cpu_pad1.i_cpu.opcode; // Adjusted to use the opcode from the CPU instance
     case (opcode)
       3'h0    : mnemonic = "HLT";
       3'h1    : mnemonic = "SKZ";
@@ -119,13 +118,13 @@ module cpu_pad_test;
     rst_ = 0;
     @ (negedge clock)
     rst_ = 1;
-    @ (posedge cpu_pad1.i_cpu.halt)
+    // @ (posedge cpu_pad1.i_cpu.ctl1.halt)
+    @ (posedge cpu_pad1.halt)
     $display("HALTED AT PC = %h", cpu_pad1.i_cpu.pc_addr);
     $finish;
   end
 
 // Define the test task
-
   task test ;
     input [2:0] N ;
     reg [12*8:1] testfile ;
@@ -138,21 +137,21 @@ module cpu_pad_test;
             begin
               $display ( "RUNNING THE BASIC DIAGOSTIC TEST" ) ;
               $display ( "THIS TEST SHOULD HALT WITH PC = 17" ) ;
-              $display ( "PC INSTR OP DATA ADR" ) ;
-              $display ( "-- ----- -- ---- ---" ) ;
+              $display ( "PC INSTR OP DATA_IN DATA_OUT ADDR HALT" ) ;
+              $display ( "---  ----  --  --- ---  --- --" ) ;
               forever @ ( cpu_pad1.i_cpu.opcode or cpu_pad1.i_cpu.ir_addr )
-	        $strobe ( "%h %s   %h  %h  %h  %h   %h",
-                   cpu_pad1.i_cpu.pc_addr, mnemonic, cpu_pad1.i_cpu.opcode, cpu_pad1.i_cpu.data_in, cpu_pad1.i_cpu.data_out, cpu_pad1.i_cpu.addr, cpu_pad1.i_cpu.halt) ;
+	        $strobe ( "%h  %s  %h  %h  %h  %h   %h",
+                   cpu_pad1.i_cpu.pc_addr, mnemonic, cpu_pad1.i_cpu.opcode, cpu_pad1.i_cpu.data_in, cpu_pad1.i_cpu.data_out, cpu_pad1.i_cpu.addr, cpu_pad1.halt) ;
             end
           2:
             begin
               $display ( "RUNNING THE ADVANCED DIAGOSTIC TEST" ) ;
               $display ( "THIS TEST SHOULD HALT WITH PC = 10" ) ;
-              $display ( "PC INSTR OP DATA ADR" ) ;
-              $display ( "-- ----- -- ---- ---" ) ;
+              $display ( "PC INSTR OP DATA_IN DATA_OUT ADDR HALT" ) ;
+              $display ( "---  ----  --  --- ---  --- --" ) ;
               forever @ ( cpu_pad1.i_cpu.opcode or cpu_pad1.i_cpu.ir_addr )
 	        $strobe ( "%h %s   %h  %h  %h  %h  %h",
-                   cpu_pad1.i_cpu.pc_addr, mnemonic, cpu_pad1.i_cpu.opcode, cpu_pad1.i_cpu.data_in, cpu_pad1.i_cpu.data_out, cpu_pad1.i_cpu.addr, cpu_pad1.i_cpu.halt) ;
+                   cpu_pad1.i_cpu.pc_addr, mnemonic, cpu_pad1.i_cpu.opcode, cpu_pad1.i_cpu.data_in, cpu_pad1.i_cpu.data_out, cpu_pad1.i_cpu.addr, cpu_pad1.halt) ;
             end
            3:
               begin

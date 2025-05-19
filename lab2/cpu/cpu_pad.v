@@ -8,12 +8,14 @@ module cpu_pad (
     output         wr,
     inout  [7:0]   data_in,
     input  [7:0]   data_out,
-    output [4:0]   addr
+    output [4:0]   addr,
+    output         halt
 );
 
   // wrapper 内部信号
   wire rd_pad, wr_pad;
   wire [7:0] data_in_pad;
+  wire halt_pad;
 
   // 实例化 cpu
   cpu i_cpu (
@@ -23,12 +25,14 @@ module cpu_pad (
     .wr       (wr_pad),
     .data_in  (data_in_pad),
     .data_out (data_out),
-    .addr     (addr)
+    .addr     (addr),
+    .halt     (halt_pad)
   );
 
   // 总线与 wrapper 端口映射
   assign rd      = rd_pad;
   assign wr      = wr_pad;
   assign data_in = data_in_pad;
+  assign halt    = halt_pad;
 
 endmodule
