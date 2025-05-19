@@ -47,6 +47,8 @@ set_dont_touch_network [get_ports clock]
 set_dont_touch_network [get_ports rst_]
 set_dont_touch_network [get_ports *]
 
+set verilogout_no_tri true
+
 compile_ultra
 
 report_constraint > ./rpt/default/rpt_consitraints

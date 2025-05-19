@@ -66,6 +66,7 @@ sim_$(1)MHz: synth_$(1)MHz prepare_sim_$(1)MHz
 		$(LIBS) -top $(TOP) -o $(SIM_DIR)/$(1)MHz/sim_$(1)MHz \
 		$(DEFINE)
 	@echo ">>> Launching simulation $(1)MHz ..."
+	@echo "========================================================"
 	@echo "$(1)MHz Sim projects are successfully created."
 	@echo "Please cd '$(SIM_DIR)/$(1)MHz', and run './sim_$(1)MHz' to start simulation."
 	@echo "After sim, we can analyze the waveform with file $(SIM_DIR)/$(1)MHz/$(TOP).vcd."
@@ -83,5 +84,6 @@ all: syn_all sim_all
 .PHONY: all syn_all sim_all
 
 clean:
-	rm -rf $(SYN_DIR)/mapped $(SYN_DIR)/rpt $(SYN_DIR)/unmapped $(SYN_DIR)/logs $(SYN_DIR)/alib-52 $(SYN_DIR)/command.log $(SYN_DIR)/default.svf $(SYN_DIR)/scripts/dc_*MHz.tcl sim
-	rm -rf csrc *.vcd *.key *.dat
+	rm -rf $(SYN_DIR)/{mapped,rpt,unmapped,logs,alib-52,command.log,default.svf} $(SYN_DIR)/scripts/dc_*MHz.tcl sim
+	rm -rf csrc *.vcd *.key *.dat *.log
+	rm -rf $(SYN_DIR)/*.pvl $(SYN_DIR)/*.syn $(SYN_DIR)/*.mr $(SYN_DIR)/*.log
