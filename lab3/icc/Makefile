@@ -11,7 +11,7 @@ run:
 	cd ./run && ./run.sh
 
 sim: 
-	cp $(LAB2_PATH)/cpu/cpu_pad_test.v ./output/
+	cp ./design_data/cpu_pad_test.v ./output/
 	cp $(LAB2_PATH)/cpu/mem.v ./output/
 	cp $(LAB2_PATH)/cpu/CPUtest*.dat ./output/
 	echo "./mem.v" > ./output/filelist.f
