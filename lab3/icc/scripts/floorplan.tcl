@@ -29,6 +29,8 @@ set_pad_physical_constraints -pad_name "i_data_out_7" -side 2 -order 3
 set_pad_physical_constraints -pad_name "i_data_out_6" -side 2 -order 4
 set_pad_physical_constraints -pad_name "i_data_out_5" -side 2 -order 5
 set_pad_physical_constraints -pad_name "i_data_out_4" -side 2 -order 6
+set_pad_physical_constraints -pad_name "o_data_in_7" -side 2 -order 7
+set_pad_physical_constraints -pad_name "o_data_in_6" -side 2 -order 8
 
 # Right side (side 3)
 set_pad_physical_constraints -pad_name "vdd1right" -side 3 -order 1
@@ -37,6 +39,8 @@ set_pad_physical_constraints -pad_name "o_addr_4" -side 3 -order 3
 set_pad_physical_constraints -pad_name "o_addr_3" -side 3 -order 4
 set_pad_physical_constraints -pad_name "o_addr_2" -side 3 -order 5
 set_pad_physical_constraints -pad_name "o_addr_1" -side 3 -order 6
+set_pad_physical_constraints -pad_name "o_data_in_5" -side 3 -order 7
+set_pad_physical_constraints -pad_name "o_data_in_4" -side 3 -order 8
 
 # Bottom side (side 4)
 set_pad_physical_constraints -pad_name "vdd2bottom" -side 4 -order 1
@@ -44,25 +48,21 @@ set_pad_physical_constraints -pad_name "vss2bottom" -side 4 -order 2
 set_pad_physical_constraints -pad_name "o_addr_0" -side 4 -order 3
 set_pad_physical_constraints -pad_name "o_rd" -side 4 -order 4
 set_pad_physical_constraints -pad_name "o_wr" -side 4 -order 5
-set_pad_physical_constraints -pad_name "i_data_out_3" -side 4 -order 6
+set_pad_physical_constraints -pad_name "o_data_out_3" -side 4 -order 6
+set_pad_physical_constraints -pad_name "o_halt" -side 4 -order 7
+set_pad_physical_constraints -pad_name "o_data_in_3" -side 4 -order 8
+set_pad_physical_constraints -pad_name "o_data_in_2" -side 4 -order 9
 
 # Left side (side 1)
 set_pad_physical_constraints -pad_name "vdd1left" -side 1 -order 1
 set_pad_physical_constraints -pad_name "vss1left" -side 1 -order 2
-set_pad_physical_constraints -pad_name "i_rst_" -side 1 -order 3
+set_pad_physical_constraints -pad_name "i_rst" -side 1 -order 3
 set_pad_physical_constraints -pad_name "i_clock" -side 1 -order 4
 set_pad_physical_constraints -pad_name "i_data_out_2" -side 1 -order 5
 set_pad_physical_constraints -pad_name "i_data_out_1" -side 1 -order 6
-
-# Place inout data_in pads (mixed on sides)
-set_pad_physical_constraints -pad_name "io_data_in_7" -side 2 -order 7
-set_pad_physical_constraints -pad_name "io_data_in_6" -side 2 -order 8
-set_pad_physical_constraints -pad_name "io_data_in_5" -side 3 -order 7
-set_pad_physical_constraints -pad_name "io_data_in_4" -side 3 -order 8
-set_pad_physical_constraints -pad_name "io_data_in_3" -side 4 -order 7
-set_pad_physical_constraints -pad_name "io_data_in_2" -side 4 -order 8
-set_pad_physical_constraints -pad_name "io_data_in_1" -side 1 -order 7
-set_pad_physical_constraints -pad_name "io_data_in_0" -side 1 -order 8
+set_pad_physical_constraints -pad_name "i_data_out_0" -side 1 -order 7
+set_pad_physical_constraints -pad_name "o_data_in_1" -side 1 -order 8
+set_pad_physical_constraints -pad_name "o_data_in_0" -side 1 -order 9
 
 ##########################################
 # Create Floorplan
@@ -87,8 +87,10 @@ report_ignored_layers
 # Create the Power Network
 ##########################################
 # Define power strategy
-set_power_plan_strategy core -core -nets {VDD VSS} \
--template ../scripts/basic_ring.tpl:basic_ring
+set_power_plan_strategy core -core -nets {VDD VSS} -template ../scripts/basic_ring.tpl:basic_ring
+
+remove_power_plan_strategy -all
+set_power_plan_strategy s_basic_no_va -nets {VDD VSS} -core -extension {{{ nets:VDD}{stop:outermost_ring}} {{nets: VSS}{stop:outermost_ring}}} -template ../scripts/pg_mesh.tpl:pg_mesh_top
 
 # Compile power plan
 compile_power_plan -ring
