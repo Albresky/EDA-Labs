@@ -35,22 +35,22 @@ module cpu_pad (
   PI i_data_out_7 (.PAD(data_out[7]), .C(data_out_pad[7]));
 
   // Output ports
-  PO8 i_rd (.I(rd_pad), .PAD(rd));
-  PO8 i_wr (.I(wr_pad), .PAD(wr));
-  PO8 i_data_in_0 (.I(data_in_pad[0]), .PAD(data_in[0]));
-  PO8 i_data_in_1 (.I(data_in_pad[1]), .PAD(data_in[1]));
-  PO8 i_data_in_2 (.I(data_in_pad[2]), .PAD(data_in[2]));
-  PO8 i_data_in_3 (.I(data_in_pad[3]), .PAD(data_in[3]));
-  PO8 i_data_in_4 (.I(data_in_pad[4]), .PAD(data_in[4]));
-  PO8 i_data_in_5 (.I(data_in_pad[5]), .PAD(data_in[5]));
-  PO8 i_data_in_6 (.I(data_in_pad[6]), .PAD(data_in[6]));
-  PO8 i_data_in_7 (.I(data_in_pad[7]), .PAD(data_in[7]));
-  PO8 i_addr_0 (.I(addr_pad[0]), .PAD(addr[0]));
-  PO8 i_addr_1 (.I(addr_pad[1]), .PAD(addr[1]));
-  PO8 i_addr_2 (.I(addr_pad[2]), .PAD(addr[2]));
-  PO8 i_addr_3 (.I(addr_pad[3]), .PAD(addr[3]));
-  PO8 i_addr_4 (.I(addr_pad[4]), .PAD(addr[4]));
-  PO8 i_halt (.I(halt_pad), .PAD(halt));
+  PO8 o_rd (.I(rd_pad), .PAD(rd));
+  PO8 o_wr (.I(wr_pad), .PAD(wr));
+  PO8 o_data_in_0 (.I(data_in_pad[0]), .PAD(data_in[0]));
+  PO8 o_data_in_1 (.I(data_in_pad[1]), .PAD(data_in[1]));
+  PO8 o_data_in_2 (.I(data_in_pad[2]), .PAD(data_in[2]));
+  PO8 o_data_in_3 (.I(data_in_pad[3]), .PAD(data_in[3]));
+  PO8 o_data_in_4 (.I(data_in_pad[4]), .PAD(data_in[4]));
+  PO8 o_data_in_5 (.I(data_in_pad[5]), .PAD(data_in[5]));
+  PO8 o_data_in_6 (.I(data_in_pad[6]), .PAD(data_in[6]));
+  PO8 o_data_in_7 (.I(data_in_pad[7]), .PAD(data_in[7]));
+  PO8 o_addr_0 (.I(addr_pad[0]), .PAD(addr[0]));
+  PO8 o_addr_1 (.I(addr_pad[1]), .PAD(addr[1]));
+  PO8 o_addr_2 (.I(addr_pad[2]), .PAD(addr[2]));
+  PO8 o_addr_3 (.I(addr_pad[3]), .PAD(addr[3]));
+  PO8 o_addr_4 (.I(addr_pad[4]), .PAD(addr[4]));
+  PO8 o_halt (.I(halt_pad), .PAD(halt));
 
   // 实例化 cpu
   cpu i_cpu (
