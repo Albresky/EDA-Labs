@@ -3,7 +3,7 @@
  * 
  * @Author: Albresky albre02@outlook.com
  * @Date: 2025-05-19 14:48:17
- * @LastEditTime: 2025-05-19 19:06:34
+ * @LastEditTime: 2025-06-03 23:16:44
  * @FilePath: /BUPT-EDA-Labs/lab3/README.md
  * 
  * @Description: 
@@ -103,17 +103,17 @@ vcs -f filelist.f \
 ./mem.v
 ```
 
->5. 反标 SDF 结束后，VCS 仿真测试结果。
+>5. 反标 SDF 结束后，VCS 仿真测试结果（**这里使用的是 100KHz 的 SDF 进行反标**）。
 
 - **测试 1**
 
-仿真结果正确，PC 指针在 addr=17 时成功 halt，当前 PC 指针指向地址 18。
+仿真结果正确，PC 指针在 addr=17 时成功 halt，当前 PC 指针指向地址 17。
 
 ![alt text](./images/test1.png)
 
 - **测试 2**
 
-仿真结果正确，PC 指针在 addr=10 时成功 halt，当前 PC 指针指向地址 18。
+仿真结果正确，PC 指针在 addr=10 时成功 halt，当前 PC 指针指向地址 17。
 
 ![alt text](./images/test2.png)
 
