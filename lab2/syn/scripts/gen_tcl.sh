@@ -27,7 +27,7 @@ mkdir -p "$(dirname "$out")"
 # 路径替换（保持syn目录内的相对路径）
 sed \
     -e "s/create_clock -period [0-9.]*/create_clock -period $period/" \
-    -e "s|default|${freq}MHz|g" \
+    -e "s|default|${freq}|g" \
     -e "s|\./rpt|./rpt|g" \
     -e "s|\./mapped|./mapped|g" \
     -e "s|\./unmapped|./unmapped|g" \
