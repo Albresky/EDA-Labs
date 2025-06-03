@@ -41,6 +41,6 @@ set_zero_interconnect_delay_mode true
 report_constraint -all
 report_timing
 set_zero_interconnect_delay_mode false
-remove_ideal_network [get_ports "rst_ clk"]
+remove_ideal_network [get_ports "rst_ clock"]
 # Save the cel after data setup
 save_mw_cel -as data_setup

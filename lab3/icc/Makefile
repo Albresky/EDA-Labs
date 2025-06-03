@@ -1,5 +1,8 @@
 LAB2_PATH=/home/b16/lab2
-FREQ=20MHz
+# Only low clock frequency is supported for SDF(100KHz below 
+# is test and passed). In current design, higher frequencies 
+# will not meet timing requirements (setup-time mainly).
+FREQ=100KHz
 
 .PHONY: run sim clean
 
@@ -31,6 +34,7 @@ sim:
 	2>&1 | tee ../logs/sim.log
 
 clean:
+	rm -rf *.log *.txt
 	rm -rf logs/*.log
 	rm -rf ./run/cpu_pad.mw ./run/ctr_tmp ./run/pna_output ./run/snapshot ./run/.__tmp_pns_undo_file.tcl
 	rm -rf ./run/*.txt ./run/*.html ./run/*.log

@@ -15,8 +15,10 @@ module cpu_pad_test;
       parameter real CLK_PERIOD = 6.67; // 150MHz
   `elsif SDF_50MHz
       parameter real CLK_PERIOD = 20.0; // 50MHz
-  `elsif SDF_20MHz
-      parameter real CLK_PERIOD = 50.0; // 20MHz
+  `elsif SDF_1MHz
+      parameter real CLK_PERIOD = 2000.0;// 5MHz
+  `elsif SDF_100KHz
+      parameter real CLK_PERIOD = 10000.0;// 100KHz = 10μs      
   `else
       parameter real CLK_PERIOD = 50.0; // Default 20MHz
   `endif
@@ -70,7 +72,8 @@ module cpu_pad_test;
 // Monitor signals
   initial begin
     $timeformat(-9, 1, " ns", 12);
-    
+    // $monitor("Time=%0t, clk=%b, pc_addr=%h, opcode=%h", 
+            //  $time, clock, cpu_pad1.i_cpu_pc_addr, cpu_pad1.i_cpu_opcode);
     // Load appropriate SDF file based on frequency
     `ifdef SDF_150MHz
       $display("Using 150MHz SDF file for timing back-annotation");
@@ -78,8 +81,11 @@ module cpu_pad_test;
     `elsif SDF_50MHz
       $display("Using 50MHz SDF file for timing back-annotation");
       $sdf_annotate("./cpu_pad.sdf", cpu_pad1);
-    `elsif SDF_20MHz
-      $display("Using 20MHz SDF file for timing back-annotation");
+    `elsif SDF_1MHz
+      $display("Using 1MHz SDF file for timing back-annotation");
+      $sdf_annotate("./cpu_pad.sdf", cpu_pad1);
+    `elsif SDF_100KHz
+      $display("Using 100KHz SDF file for timing back-annotation");
       $sdf_annotate("./cpu_pad.sdf", cpu_pad1);
     `endif
     
