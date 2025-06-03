@@ -23,6 +23,7 @@ sim:
 	-debug_acc+all \
 	-debug_all \
 	+define+FSDB \
+	+define+SDF_$(FREQ) \
 	/home/eda/houfang/smic13g.v \
 	/home/eda/houfang/SP013D3_V1p2.v \
 	./cpu_pad_test.v \
