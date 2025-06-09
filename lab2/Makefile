@@ -80,6 +80,6 @@ all: syn_all sim_all
 .PHONY: all syn_all sim_all
 
 clean:
-	rm -rf $(SYN_DIR)/{mapped,rpt,unmapped,logs,alib-52,command.log,default.svf} $(SYN_DIR)/scripts/dc_*MHz.tcl sim
+	rm -rf $(SYN_DIR)/{mapped,rpt,unmapped,logs,alib-52,command.log,default.svf} $(SYN_DIR)/scripts/dc_*Hz.tcl sim
 	rm -rf csrc *.vcd *.key *.dat *.log
 	rm -rf $(SYN_DIR)/*.pvl $(SYN_DIR)/*.syn $(SYN_DIR)/*.mr $(SYN_DIR)/*.log
