@@ -87,7 +87,7 @@ report_ignored_layers
 # Create the Power Network
 ##########################################
 # Define power strategy
-set_power_plan_strategy core -core -nets {VDD VSS} -template ../scripts/basic_ring.tpl:basic_ring
+set_power_ring_strategy core -core -nets {VDD VSS} -template ../scripts/basic_ring.tpl:basic_ring
 
 remove_power_plan_strategy -all
 set_power_plan_strategy s_basic_no_va -nets {VDD VSS} -core -extension {{{ nets:VDD}{stop:outermost_ring}} {{nets: VSS}{stop:outermost_ring}}} -template ../scripts/pg_mesh.tpl:pg_mesh_top
