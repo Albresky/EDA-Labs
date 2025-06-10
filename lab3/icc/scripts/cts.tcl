@@ -3,12 +3,10 @@ source ../rm_setup/lcrm_setup.tcl
 source -echo ../rm_setup/icc_setup.tcl
 open_mw_lib cpu_pad.mw
 copy_mw_cel -from placed -to cts
-open_mw_cel placed
+open_mw_cel cts
 source -echo ../scripts/common_optimization_settings_icc.tcl
 source -echo ../scripts/common_placement_settings_icc.tcl
 
-set_lib_cell_purpose -exclude [get_lib_cells */BUFX*] none
-set_lib_cell_purpose -include [get_lib_cells "*/BUFX2 */BUFX3 */BUFX4 */BUFX6 */BUFX8"] cts
 
 # source -echo common_cts_settings_icc.tcl
 # Check The Design Before CTS
@@ -23,26 +21,18 @@ remove_clock_uncertainty [all_clocks]
 # Defining CTS- Specific DRC Values
 # The default values are to be used
 # Specifying CTS Targets: Skew and Insertion Delay
-set_clock_tree_option -target_early_delay 1
+set_clock_tree_options -target_early_delay 1
 set_clock_tree_options -target_skew 0.01
-set_clock_tree_option -target_late_delay 2
+report_clock_tree -settings
 
-set_clock_tree_options -optimize_for_hold true
-set_clock_tree_options -optimize_for_setup true
 set_clock_tree_options -buffer_relocation true
-set_clock_tree_options -clock_gating_integrated_optimization true
-set_clock_tree_options -use_default_skew_group false
-
-set_clock_tree_options -setup_fixing true
-set_clock_tree_options -logic_resynthesis true
 
 # Enable force buffer sizing and gate sizing
-set_clock_tree_options -buffer_sizing enable
-set_clock_tree_options -gate_sizing enable
+set_clock_tree_options -buffer_sizing true
+set_clock_tree_options -gate_sizing true
 
 # Lowering the clock tree skew and transition
-set_clock_tree_options -max_skew 0.1
-set_clock_tree_options -max_trans 0.5
+set_clock_tree_options -max_transition 0.5
 
 report_clock_tree -settings
 
@@ -51,8 +41,9 @@ report_clock_tree -settings
 #CTS and Timing Optimization
 
 # Clock tree synthesis
-clock_opt -no_clock_route -only_cts -optimize_hold_setup
+clock_opt -no_clock_route -only_cts
 update_clock_latency
+
 report_clock_tree
 report_clock_timing -type skew
 
@@ -60,11 +51,8 @@ report_clock_timing -type skew
 set_fix_hold [all_clocks]
 set_separate_process_options -placement false
 
-clock_opt -only_psyn -no_clock_route -fix_setup_all_clocks
-clock_opt -only_psyn -no_clock_route -fix_setup_all_clocks
-clock_opt -only_psyn -no_clock_route -fix_setup_all_clocks
+clock_opt -only_psyn -no_clock_route
 clock_opt -only_psyn -no_clock_route -fix_hold_all_clocks
-clock_opt -only_psyn -no_clock_route -fix_setup_all_clocks
 clock_opt -only_psyn -no_clock_route
 
 report_clock_tree
