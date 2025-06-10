@@ -2,6 +2,9 @@ LAB2_PATH=/home/b16/lab2
 # Only low clock frequency is supported for SDF(100KHz below 
 # is test and passed). In current design, higher frequencies 
 # will not meet timing requirements (setup-time mainly).
+# 
+# Note: The SDF annotation in `design_data/cpu_pad_test.v` must
+# be updated as well according to the `FREQ` value below.
 FREQ=100KHz
 
 .PHONY: run sim clean
