@@ -1,4 +1,5 @@
-FREQUENCIES := 100KHz 1MHz 20MHz
+# The FREQENCIES must be in the format of xxxKHz, xxxMHz.
+FREQUENCIES := 100KHz 10MHz 50MHz
 SYN_DIR := syn
 TCL_SOURCE := $(SYN_DIR)/scripts/dc_scripts.tcl
 GEN_SCRIPT := $(SYN_DIR)/scripts/gen_tcl.sh
