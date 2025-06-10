@@ -48,7 +48,7 @@ set_pad_physical_constraints -pad_name "vss2bottom" -side 4 -order 2
 set_pad_physical_constraints -pad_name "o_addr_0" -side 4 -order 3
 set_pad_physical_constraints -pad_name "o_rd" -side 4 -order 4
 set_pad_physical_constraints -pad_name "o_wr" -side 4 -order 5
-set_pad_physical_constraints -pad_name "o_data_out_3" -side 4 -order 6
+set_pad_physical_constraints -pad_name "i_data_out_3" -side 4 -order 6
 set_pad_physical_constraints -pad_name "o_halt" -side 4 -order 7
 set_pad_physical_constraints -pad_name "o_data_in_3" -side 4 -order 8
 set_pad_physical_constraints -pad_name "o_data_in_2" -side 4 -order 9
