@@ -18,8 +18,6 @@ psynopt -area_recovery -congestion
 refine_placement -congestion_effort high
 psynopt -area_recovery -congestion
 
-report_utilization
-
 create_qor_snapshot -name placed
 query_qor_snapshot -name placed
 save_mw_cel -as placed
