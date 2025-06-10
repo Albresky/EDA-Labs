@@ -1,4 +1,6 @@
 # The FREQENCIES must be in the format of xxxKHz, xxxMHz.
+# Note: The SDF annotation in `cpu/cpu_pad_test.v` must
+# be updated as well according to the `FREQ` value below.
 FREQUENCIES := 100KHz 10MHz 50MHz
 SYN_DIR := syn
 TCL_SOURCE := $(SYN_DIR)/scripts/dc_scripts.tcl
