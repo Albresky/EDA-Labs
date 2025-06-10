@@ -9,6 +9,8 @@
  - `sim`
     - 仿真工程目录（逻辑综合后，通过 `make sim_all` 生成）
 
+> 注：进行 Make 构建前，请先更正 [./syn/common_setup.tcl](./syn/common_setup.tcl) 脚本中的绝对路径。
+
 ## 二、实验要求及报告
 
 ### 2.1 CPU RTL 验证
