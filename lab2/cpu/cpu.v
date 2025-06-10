@@ -89,6 +89,10 @@ output halt; // 新增
  .clk (inc_pc ), 
  .rst_ (rst_ ) 
  ); 
+ //clock clk 
+ //( 
+ //.clk (clock ) 
+ //); 
 
  always@(*) data_in = (data_e) ? alu_out: 8'bz; 
 endmodule

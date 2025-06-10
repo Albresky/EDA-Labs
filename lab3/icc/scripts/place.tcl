@@ -11,7 +11,7 @@ source -echo ../scripts/common_placement_settings_icc.tcl
 #######################################
 
 check_physical_design -stage pre_place_opt
-set_ideal_network [all_fanout -flat -clock_tree]
+set_ideal_network [all_fanout -flat -from [get_ports clock]]
 set_separate_process_options -placement false
 place_opt -area_recovery -congestion
 psynopt -area_recovery -congestion
